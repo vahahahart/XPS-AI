@@ -1,9 +1,8 @@
 /.vscode
 /__pycache__
-/articles
-/figures
+/other
 /train_log
 /data
 /draft.py
 /draft.ipynb
-
+/tmp

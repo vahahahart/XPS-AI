@@ -1,0 +1,6 @@
+outs:
+- md5: 2110ac844a01a3beebce85454b7b7dd6.dir
+  size: 19212002
+  nfiles: 24
+  hash: md5
+  path: tmp
