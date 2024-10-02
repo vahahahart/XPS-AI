@@ -1,7 +1,9 @@
 /.vscode
-/WEIGHTS_OLD
 /__pycache__
 /articles
+/figures
+/train_log
 /data
 /draft.py
-/todo.md
+/draft.ipynb
+
