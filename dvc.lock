@@ -1,0 +1,88 @@
+schema: '2.0'
+stages:
+  generate_data:
+    cmd: python3 -m model.train.synth_data
+    deps:
+    - path: utils.py
+      hash: md5
+      md5: 7e46ee3efb539a353428a7d9392fcccb
+      size: 2911
+    params:
+      model/params.yaml:
+        synth_data:
+          seed: 42
+          labeling:
+            peak_area: 3
+            max_area: 3
+          peak_types:
+            large:
+              scale:
+                val: 6
+                var: 16
+              const:
+                val: 0.9
+                var: 0.2
+              gl_const:
+                val: 0.6
+                var: 0.3
+              background_const:
+                val: 0
+                var: 0.003
+            medium:
+              scale:
+                val: 14
+                var: 12
+              const:
+                val: 0.4
+                var: 0.3
+              gl_const:
+                val: 0.6
+                var: 0.3
+              background_const:
+                val: 0
+                var: 0.001
+            impurity:
+              scale:
+                val: 14
+                var: 12
+              const:
+                val: 0.05
+                var: 0.2
+              gl_const:
+                val: 0.6
+                var: 0.3
+              background_const:
+                val: 0
+                var: 0
+            satellite:
+              scale:
+                val: 4
+                var: 4
+              const:
+                val: 0.01
+                var: 0.03
+              gl_const:
+                val: 1
+                var: 0
+              background_const:
+                val: 0
+                var: 0
+          spectrum_params:
+            len: 256
+            noise:
+              val: 0.0009
+              size: 120
+              var: 100
+            shakeup: 2e-05
+            n_of_peaks:
+              large: 1-2
+              medium: 0-2
+              impurity: 0-2
+              satellite: 0-2
+          dataset_size: 10000
+    outs:
+    - path: model/train/data/dataset
+      hash: md5
+      md5: 53076df07c940b50589b9587062e704d.dir
+      size: 48364123
+      nfiles: 10000

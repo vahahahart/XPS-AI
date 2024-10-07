@@ -1,0 +1,11 @@
+stages:
+  generate_data:
+    cmd: python3 -m model.train.synth_data
+    deps:
+    - utils.py
+    params:
+    - model/params.yaml:
+      - synth_data
+    outs:
+    - model/train/data/dataset:
+        cache: false

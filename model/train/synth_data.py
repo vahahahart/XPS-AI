@@ -113,5 +113,7 @@ class SynthGenerator():
             
 
 if __name__ == '__main__':
+    path = 'model/train/data/dataset'
     gen = SynthGenerator()
-    gen.gen_dataset('model/train/data/dataset')
+    p = Path(path).mkdir(exist_ok=True)
+    gen.gen_dataset(path)
