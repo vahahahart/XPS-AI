@@ -9,3 +9,16 @@ stages:
     outs:
     - model/train/data/dataset:
         cache: false
+  train:
+    cmd: python3 -m model.train.train
+    deps:
+    - model/train/metrics.py
+
+    params:
+    - model/params.yaml:
+      - seed
+      - data_path
+      - train
+    outs:
+    - model/train/trained_models/model_v1.pth:
+        cache: false

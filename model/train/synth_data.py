@@ -34,10 +34,12 @@ class SynthGenerator():
     def __init__(self) -> None:
         """Initialize the parameters from params.yaml."""
         yaml_loader = YAML(typ='safe', pure=True)
-        params = yaml_loader.load(Path('model/params.yaml'))['synth_data']
-        self.params = params
+        params = yaml_loader.load(Path('model/params.yaml'))
+        self.params = params['synth_data']
         seed(params['seed'])
 
+        self.path_to_data = Path(params['data_path'])
+        
         spectrum_len = self.params['spectrum_params']['len']
         self.x = np.arange(0, spectrum_len, dtype=np.float32)
         
@@ -104,16 +106,15 @@ class SynthGenerator():
 
         return x, y, peak_mask, max_mask, peak_params
 
-    def gen_dataset(self, path):
+    def gen_dataset(self):
+        self.path_to_data.mkdir(exist_ok=True)
         size = self.params['dataset_size']
         for i in range(size):
             x, y, peak_mask, max_mask, peak_params = self.gen_spectrum()
             data = pd.DataFrame(np.stack((y, peak_mask, max_mask), axis=1))
-            data.to_csv(f'{path}/{i}.csv', header=False, index=False)
+            data.to_csv(f'{self.path_to_data}/{i}.csv', header=False, index=False)
             
 
 if __name__ == '__main__':
-    path = 'model/train/data/dataset'
     gen = SynthGenerator()
-    p = Path(path).mkdir(exist_ok=True)
-    gen.gen_dataset(path)
+    gen.gen_dataset()
