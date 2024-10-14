@@ -21,7 +21,6 @@ class XPSDataset(Dataset):
 
         x = array[:, 0]
         x = torch.tensor(x ,dtype=torch.float32, device=self.device).view(1, -1)
-        x = (x - x.min()) / (x.max() - x.min())
 
         peak_mask = array[:, 1]
         peak_mask = torch.tensor(peak_mask, dtype=torch.float32, device=self.device)
