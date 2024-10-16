@@ -5,12 +5,11 @@ stages:
     deps:
     - path: utils.py
       hash: md5
-      md5: 7e46ee3efb539a353428a7d9392fcccb
-      size: 2911
+      md5: 7c6bf91934a697d604fd040c3c12d0e6
+      size: 2895
     params:
       model/params.yaml:
         synth_data:
-          seed: 42
           labeling:
             peak_area: 3
             max_area: 3
@@ -56,11 +55,11 @@ stages:
                 var: 0
             satellite:
               scale:
-                val: 4
-                var: 4
+                val: 3
+                var: 3
               const:
-                val: 0.01
-                var: 0.03
+                val: 0.005
+                var: 0.015
               gl_const:
                 val: 1
                 var: 0
@@ -86,3 +85,24 @@ stages:
       md5: 53076df07c940b50589b9587062e704d.dir
       size: 48364123
       nfiles: 10000
+  train:
+    cmd: python3 -m model.train.train
+    deps:
+    - path: model/train/metrics.py
+      hash: md5
+      md5: 92daf67645d72244641eaf58b83083d0
+      size: 2804
+    params:
+      model/params.yaml:
+        data_path: model/train/data/dataset
+        seed: 42
+        train:
+          num_epoch: 200
+          batch_size: 500
+          learning_rate: 0.0005
+          train_test_split: 0.8
+    outs:
+    - path: model/train/trained_models/model_v1.pth
+      hash: md5
+      md5: 9e7f32d10131bd744a9163a59e100685
+      size: 873618

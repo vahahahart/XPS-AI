@@ -34,35 +34,34 @@ def seed_worker(worker_id):
     np.random.seed(worker_seed)
     random.seed(worker_seed)
 
-
+@torch.no_grad()
 def evaluate(model, val_loader, criterion, metrics=()):
-    with torch.no_grad():
 
-        results = {
-            'val_loss': 0,
-            'peak_loss': 0,
-            'max_loss': 0
-        }
-        results.update([(f'peak_{name}', 0) for name, f in metrics])
-        results.update([(f'max_{name}', 0) for name, f in metrics])
+    results = {
+        'val_loss': 0,
+        'peak_loss': 0,
+        'max_loss': 0
+    }
+    results.update([(f'peak_{name}', 0) for name, f in metrics])
+    results.update([(f'max_{name}', 0) for name, f in metrics])
 
-        l = len(val_loader)
-        for x, peak_mask, max_mask in val_loader:
-            pred_peak_mask, pred_max_mask = model(x)
-            peak_targets = peak_mask.view(-1)
-            max_targets = max_mask.view(-1)
+    l = len(val_loader)
+    for x, peak_mask, max_mask in val_loader:
+        pred_peak_mask, pred_max_mask = model(x)
+        peak_targets = peak_mask.view(-1)
+        max_targets = max_mask.view(-1)
 
-            peak_inputs = pred_peak_mask.view(-1)
-            max_inputs = pred_max_mask.view(-1)
+        peak_inputs = pred_peak_mask.view(-1)
+        max_inputs = pred_max_mask.view(-1)
 
-            results['peak_loss'] += criterion(peak_inputs, peak_targets).detach().numpy() / l
-            results['max_loss'] += criterion(max_inputs, max_targets).detach().numpy() / l
+        results['peak_loss'] += criterion(peak_inputs, peak_targets).detach().numpy() / l
+        results['max_loss'] += criterion(max_inputs, max_targets).detach().numpy() / l
 
-            for name, func in metrics:
-                results[f'peak_{name}'] += func(peak_inputs, peak_targets).detach().numpy() / l
-                results[f'max_{name}'] += func(max_inputs, max_targets).detach().numpy() / l
+        for name, func in metrics:
+            results[f'peak_{name}'] += func(peak_inputs, peak_targets).detach().numpy() / l
+            results[f'max_{name}'] += func(max_inputs, max_targets).detach().numpy() / l
 
-        results['val_loss'] = (results['peak_loss'] + results['max_loss']) / 2
+    results['val_loss'] = (results['peak_loss'] + results['max_loss']) / 2
 
     return results
 
@@ -82,7 +81,7 @@ def train_one_epoch(model, train_loader, optimizer, criterion):
 
         sum_train_loss += train_loss.detach().numpy()
 
-    return sum_train_loss 
+    return sum_train_loss / len(train_loader)
 
 
 if __name__ == '__main__':
@@ -128,8 +127,8 @@ if __name__ == '__main__':
     criterion = IoULoss()
     metrics = (
         ('accuracy', Accuracy()),
-        ('precison', Precision()),
-        ('Recall', Recall())
+        ('precision', Precision()),
+        ('recall', Recall())
     )
 
     with Live() as live:

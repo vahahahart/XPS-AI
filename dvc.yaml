@@ -5,6 +5,8 @@ stages:
     - utils.py
     params:
     - model/params.yaml:
+      - seed
+      - data_path
       - synth_data
     outs:
     - model/train/data/dataset:
@@ -13,12 +15,17 @@ stages:
     cmd: python3 -m model.train.train
     deps:
     - model/train/metrics.py
-
     params:
     - model/params.yaml:
       - seed
       - data_path
+      - synth_data
       - train
     outs:
     - model/train/trained_models/model_v1.pth:
         cache: false
+metrics:
+- dvclive/metrics.json
+plots:
+- dvclive/plots/metrics:
+    x: step
