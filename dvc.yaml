@@ -21,9 +21,6 @@ stages:
       - data_path
       - synth_data
       - train
-    outs:
-    - model/train/trained_models/model_v1.pth:
-        cache: false
 metrics:
 - dvclive/metrics.json
 plots:

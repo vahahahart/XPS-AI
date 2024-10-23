@@ -47,10 +47,10 @@ synth_data:
     satellite:
       scale:
         val: 4
-        var: 4 
+        var: 4
       const:
-        val: 0.01
-        var: 0.03
+        val: 0.025
+        var: 0.015
       gl_const:
         val: 1
         var: 0

@@ -9,8 +9,6 @@ from dvclive import Live
 from ruamel.yaml import YAML
 
 import torch
-from torch import nn
-from torch.nn import functional as F
 from torch.optim import Adam
 from torch.utils.data import DataLoader, random_split
 
@@ -38,7 +36,6 @@ def seed_worker(worker_id):
 def evaluate(model, val_loader, criterion, metrics=()):
 
     results = {
-        'val_loss': 0,
         'peak_loss': 0,
         'max_loss': 0
     }
@@ -61,9 +58,9 @@ def evaluate(model, val_loader, criterion, metrics=()):
             results[f'peak_{name}'] += func(peak_inputs, peak_targets).detach().numpy() / l
             results[f'max_{name}'] += func(max_inputs, max_targets).detach().numpy() / l
 
-    results['val_loss'] = (results['peak_loss'] + results['max_loss']) / 2
+    val_loss = (results['peak_loss'] + results['max_loss']) / 2
 
-    return results
+    return val_loss, results
 
 def train_one_epoch(model, train_loader, optimizer, criterion):
     sum_train_loss = 0
@@ -96,8 +93,7 @@ if __name__ == '__main__':
     torch.manual_seed(seed)
     random.seed(seed)
     np.random.seed(seed)
-    gen = torch.Generator()
-    gen.manual_seed(seed)
+    gen = torch.Generator().manual_seed(seed)
 
     # load model and data
     model = XPSModel()
@@ -132,21 +128,28 @@ if __name__ == '__main__':
     )
 
     with Live() as live:
-        path = 'model/train/trained_models/model_v1.pth'
+        path = 'model/train/trained_models/model.pth'
 
         for epoch in range(num_epoch):
+            best_val_loss = 1
+
+            s = time()
             model.train()
             train_loss = train_one_epoch(model, train_loader, optimizer, criterion)
             model.eval()
-            out_metrics = evaluate(model, val_loader, criterion, metrics)
+            val_loss, out_metrics = evaluate(model, val_loader, criterion, metrics)
+            f = time()
+
+            if val_loss < best_val_loss:
+                best_state = model.state_dict()
+                best_val_loss = val_loss
+
+            live.log_metric('train_loss', train_loss, timestamp=True)
+            live.log_metric('val_loss', val_loss)
             for metric_name, val in out_metrics.items():
-                live.log_metric(metric_name, val, timestamp=True)
+                live.log_metric(metric_name, val)
             live.next_step()
+            print(f'Epoch {epoch} finished at {f-s:.1f}s')
         
+        model.load_state_dict(best_state)
         torch.save(model, path)
-        live.log_artifact(
-            path,
-            type='model',
-            name='cnn_v1.0',
-            desc='cnn trained on new dataset'
-        )
